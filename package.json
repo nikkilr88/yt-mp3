@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
-    "build": "electron-packager . --out=win --overwite",
+    "build": "electron-packager . --out=win --overwrite",
     "build:portable": "electron-builder -p never --win"
   },
   "build": {
