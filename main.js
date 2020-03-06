@@ -1,8 +1,10 @@
+const path = require('path')
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
-const ffmpegPath = require('ffmpeg-static')
-const YoutubeMp3Downloader = require('youtube-mp3-downloader')
+const Downloader = require('./downloader')
 
-// require('electron-reload')(__dirname)
+require('electron-reload')(__dirname, {
+  electron: path.join(__dirname, 'node_modules', '.bin', 'electron.cmd')
+})
 
 // !: WINDOW SHIZZ =================
 
@@ -11,7 +13,7 @@ let win
 const createWindow = () => {
   win = new BrowserWindow({
     width: 800,
-    height: 295,
+    height: 290,
     webPreferences: {
       nodeIntegration: true
     }
@@ -20,7 +22,7 @@ const createWindow = () => {
   win.loadFile('index.html')
   win.setMenuBarVisibility(false)
 
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -45,50 +47,16 @@ app.on('activate', () => {
   }
 })
 
-// !: FRONTEND SHIZZ =================
+// !: IPC SHIZZ =================
 
 ipcMain.on('download', async (event, link) => {
   const id = link.split('?v=')[1]
 
-  let dir = await dialog.showOpenDialog(win, {
+  const dir = await dialog.showOpenDialog(win, {
     properties: ['openDirectory']
   })
 
-  let path = dir.filePaths[0]
-
-  downloadMP3(id, path, event)
+  const outputPath = dir.filePaths[0]
+  const downloader = new Downloader({ outputPath })
+  downloader.downloadMP3({ id, event })
 })
-
-// !: DOWNLOADER SHIZZ =================
-
-// TODO: Move all of this to seperate file!
-
-const downloadMP3 = (id, path, event) => {
-  const downloader = new YoutubeMp3Downloader({
-    ffmpegPath,
-    outputPath: path,
-    youtubeVideoQuality: 'highest',
-    queueParallelism: 1,
-    progressTimeout: 100
-  })
-
-  downloader.download(id)
-
-  downloader.on('finished', (err, data) => {
-    console.log({ data })
-    event.sender.send('download-complete', 'Download complete!')
-  })
-
-  downloader.on('error', error => {
-    console.log({ error })
-    event.sender.send(
-      'download-error',
-      'Something went wrong! Check URL and try again.'
-    )
-  })
-
-  downloader.on('progress', progress => {
-    console.log(JSON.stringify(progress))
-    event.sender.send('download-progress', progress.progress.percentage)
-  })
-}
