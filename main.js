@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const ffmpegPath = require('ffmpeg-static')
 const YoutubeMp3Downloader = require('youtube-mp3-downloader')
 
-require('electron-reload')(__dirname)
+// require('electron-reload')(__dirname)
 
 // !: WINDOW SHIZZ =================
 
@@ -11,7 +11,7 @@ let win
 const createWindow = () => {
   win = new BrowserWindow({
     width: 800,
-    height: 350,
+    height: 295,
     webPreferences: {
       nodeIntegration: true
     }
@@ -20,7 +20,7 @@ const createWindow = () => {
   win.loadFile('index.html')
   win.setMenuBarVisibility(false)
 
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -75,6 +75,7 @@ const downloadMP3 = (id, path, event) => {
   downloader.download(id)
 
   downloader.on('finished', (err, data) => {
+    console.log({ data })
     event.sender.send('download-complete', 'Download complete!')
   })
 
