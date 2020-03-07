@@ -1,4 +1,4 @@
-const EventEmitter = require('../EventEmitter')
+const EventEmitter = require('../event-emitter')
 const AppModel = require('../models/app.model.js')
 
 class AppView extends EventEmitter {
