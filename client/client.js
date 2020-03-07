@@ -14,11 +14,14 @@ downloadBtn.addEventListener('click', e => {
 })
 
 const downloadMP3 = link => {
+  downloadBtn.disabled = true
+  downloadBtn.innerText = '...'
+
   ipcRenderer.send('download', link)
 
   ipcRenderer.on('download-progress', (event, percentage) => {
     display.innerHTML = `
-    <p class="downloading"> Downloading: ${Math.round(percentage)}% complete 
+    <p class="downloading"> Converting: ${Math.round(percentage)}% complete 
       <span class="progress" style="width:${percentage}%;" />
     </p>`
   })
@@ -26,6 +29,9 @@ const downloadMP3 = link => {
   ipcRenderer.on('download-complete', (event, message) => {
     display.innerHTML = `<p class='success'>${message}</p>`
     input.value = ''
+
+    downloadBtn.disabled = false
+    downloadBtn.innerText = 'Convert'
   })
 
   ipcRenderer.on('download-error', (event, errorMessage) => {

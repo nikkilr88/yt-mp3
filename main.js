@@ -1,6 +1,12 @@
 const path = require('path')
+const fs = require('fs')
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { removeFile } = require('./utils')
 const Downloader = require('./downloader')
+
+const downloader = new Downloader({
+  outputPath: path.join(__dirname, 'downloads')
+})
 
 // !: WINDOW SHIZZ =================
 
@@ -9,7 +15,7 @@ let win
 const createWindow = () => {
   win = new BrowserWindow({
     width: 800,
-    height: 290,
+    height: 280,
     webPreferences: {
       nodeIntegration: true
     }
@@ -45,17 +51,40 @@ app.on('activate', () => {
 
 // !: IPC SHIZZ =================
 
-// TODO: Look into using save file dialog
-// https://stackoverflow.com/questions/53835596/get-created-files-path-from-savefiledialog-in-electron
-
 ipcMain.on('download', async (event, link) => {
+  // Get YouTube video id from URL
   const id = link.split('?v=')[1]
 
-  const dir = await dialog.showOpenDialog(win, {
-    properties: ['openDirectory']
+  // Convert and download file locally, return file data
+  const fileData = await downloader.downloadMP3({ id, event })
+
+  // Read file and open save dialog.
+  // We do this so the user can choose the save location and set the filename all at once.
+  const savePath = await dialog.showSaveDialog({
+    defaultPath: fileData.videoTitle,
+    filters: [
+      {
+        name: 'mp3',
+        extensions: ['mp3']
+      }
+    ]
   })
 
-  const outputPath = dir.filePaths[0]
-  const downloader = new Downloader({ outputPath })
-  downloader.downloadMP3({ id, event })
+  // If the user closes the dialog without saving, we remove the mp3 file from our downloads folder
+  if (savePath.filePath === '') {
+    return removeFile(fileData.file)
+  }
+
+  // Read the mp3 file!
+  const mp3 = fs.readFileSync(fileData.file)
+
+  // Save the file!
+  fs.writeFile(savePath.filePath, mp3, error => {
+    if (error) {
+      console.log(error)
+    }
+
+    // Once the file has been saved, we remove it from our downloads folder
+    removeFile(fileData.file)
+  })
 })

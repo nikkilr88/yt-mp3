@@ -13,22 +13,26 @@ class Downloader {
   }
 
   downloadMP3 = ({ id, event }) => {
-    this.downloader.download(id)
+    return new Promise((resolve, reject) => {
+      this.downloader.download(id)
 
-    this.downloader.on('finished', (err, data) => {
-      event.sender.send('download-complete', 'Download complete!')
-    })
+      this.downloader.on('finished', (err, data) => {
+        event.sender.send('download-complete', 'Complete!')
+        resolve(data)
+      })
 
-    this.downloader.on('error', error => {
-      console.log({ error })
-      event.sender.send(
-        'download-error',
-        'Something went wrong! Check URL and try again.'
-      )
-    })
+      this.downloader.on('error', error => {
+        console.log({ error })
+        event.sender.send(
+          'download-error',
+          'Something went wrong! Check URL and try again.'
+        )
+        reject(error)
+      })
 
-    this.downloader.on('progress', progress => {
-      event.sender.send('download-progress', progress.progress.percentage)
+      this.downloader.on('progress', progress => {
+        event.sender.send('download-progress', progress.progress.percentage)
+      })
     })
   }
 }
