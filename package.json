@@ -4,17 +4,8 @@
   "main": "main.js",
   "license": "MIT",
   "scripts": {
-    "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
-    "build": "electron-packager . --out=win --overwrite",
-    "build:portable": "electron-builder -p never --win"
-  },
-  "build": {
-    "files": [
-      "main.js",
-      "index.html",
-      "client/*"
-    ]
+    "build": "electron-packager . --out=win --overwrite"
   },
   "dependencies": {
     "ffmpeg-static": "^4.0.1",

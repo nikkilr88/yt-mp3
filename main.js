@@ -2,10 +2,6 @@ const path = require('path')
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const Downloader = require('./downloader')
 
-require('electron-reload')(__dirname, {
-  electron: path.join(__dirname, 'node_modules', '.bin', 'electron.cmd')
-})
-
 // !: WINDOW SHIZZ =================
 
 let win
@@ -22,7 +18,7 @@ const createWindow = () => {
   win.loadFile('index.html')
   win.setMenuBarVisibility(false)
 
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -48,6 +44,9 @@ app.on('activate', () => {
 })
 
 // !: IPC SHIZZ =================
+
+// TODO: Look into using save file dialog
+// https://stackoverflow.com/questions/53835596/get-created-files-path-from-savefiledialog-in-electron
 
 ipcMain.on('download', async (event, link) => {
   const id = link.split('?v=')[1]
