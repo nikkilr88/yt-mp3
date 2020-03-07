@@ -59,12 +59,12 @@ form > button {
   padding: 5px;
 }
 
-.display > p.downloading {
+.display > p.DOWNLOADING {
   color: #fff;
   position: relative;
 }
 
-.display > p.downloading .progress {
+.display > p.DOWNLOADING .progress {
   position: absolute;
   top: 0;
   left: 0;
@@ -73,7 +73,7 @@ form > button {
   z-index: -1;
 }
 
-.display > p.success {
+.display > p.SUCCESS {
   background: #27ae60;
   color: #fff;
 }

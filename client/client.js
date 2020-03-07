@@ -1,34 +1,15 @@
 const { ipcRenderer } = require('electron')
+const AppModel = require('./client/models/app.model.js')
+const AppView = require('./client/views/app.view.js')
+const AppController = require('./client/controllers/app.controller.js')
+const Service = require('./client/services')
 
-// !: DOM Elements
-const downloadBtn = document.querySelector('.download-btn')
-const input = document.querySelector('.input')
-const display = document.querySelector('.display')
+const service = new Service()
+const model = new AppModel()
+const view = new AppView({ model })
 
-downloadBtn.addEventListener('click', e => {
-  e.preventDefault()
-
-  if (input.value !== '') {
-    downloadMP3(input.value)
-  }
+const controller = new AppController({
+  view,
+  model,
+  service
 })
-
-const downloadMP3 = link => {
-  ipcRenderer.send('download', link)
-
-  ipcRenderer.on('download-progress', (event, percentage) => {
-    display.innerHTML = `
-    <p class="downloading"> Downloading: ${Math.round(percentage)}% complete 
-      <span class="progress" style="width:${percentage}%;" />
-    </p>`
-  })
-
-  ipcRenderer.on('download-complete', (event, message) => {
-    display.innerHTML = `<p class='success'>${message}</p>`
-    input.value = ''
-  })
-
-  ipcRenderer.on('download-error', (event, errorMessage) => {
-    display.innerHTML = `<p class='error'>${errorMessage}</p>`
-  })
-}
