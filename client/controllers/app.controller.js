@@ -1,5 +1,7 @@
 const Service = require('../services')
 
+// https://alexatnet.com/model-view-controller-mvc-in-javascript/
+
 class AppController {
   constructor({ view, model, service }) {
     this._view = view
